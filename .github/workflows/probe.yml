@@ -6,20 +6,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Start listener
+        shell: bash
         run: |
           IP=$(curl -s https://api.ipify.org)
           DOMAIN=$(echo "$IP" | tr . -).nip.io
           echo "IP=$IP"
           echo "DOMAIN=$DOMAIN"
           python3 - <<'PYS' &
-import socket, sys
-s=socket.socket()
-s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-s.bind(('0.0.0.0',2083))
-s.listen(5)
-print('LISTENING', flush=True)
-conn, addr = s.accept()
-print('CONN', addr, flush=True)
-print(conn.recv(64).hex(), flush=True)
-PYS
+          import socket
+          s = socket.socket()
+          s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+          s.bind(("0.0.0.0", 2083))
+          s.listen(5)
+          print("LISTENING", flush=True)
+          conn, addr = s.accept()
+          print("CONN", addr, flush=True)
+          print(conn.recv(64).hex(), flush=True)
+          PYS
           sleep 600
